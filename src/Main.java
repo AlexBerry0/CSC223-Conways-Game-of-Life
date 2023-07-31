@@ -18,11 +18,6 @@ public class Main {
             }
 //          If the number is greater than or equal to 50 it will ask them again as it is too big
 
-            else if (rowsandcolumns == 80087355) {
-                System.out.println("Please Select squared to fill");
-                manual = true;
-
-            }
 
             else if (rowsandcolumns >= 50) {
                 System.out.println("That number is too big please try again");
@@ -55,6 +50,8 @@ public class Main {
             }
             System.out.println();
         }
+
+//        Declares Variables relating to the big loop, namely a counter for the number of generations and the number of changes that occur in each generation
         int numOfGens = 0;
         int numOfChangesInGen = 0;
 
@@ -62,17 +59,24 @@ public class Main {
 
 
 
-
+//      Massive do while loop for running the program to calculate each next generation
         do {
+//            adds one to the number of geneations and sets the number of changes in each generation to 0
             numOfGens++;
             numOfChangesInGen = 0;
+//            Creates a new 2d array that is used to store what values each of the cells should be updated to at the end of the calculations
+            int[][] gridarraytwoelectricboolgaloo = new int[(int) rowsandcolumns][(int) rowsandcolumns];
+//            Log the generation number
             System.out.print("Generation: "+ numOfGens + "\n");
+
+//           For loop that goes through each cell
             for (int i = 0; i < gridarray.length; i++) {
                 for (int j = 0; j < gridarray[i].length; j++) {
 
-
+//                  creates a variable that is used to store the number of neighbors
                     int perSquareCounterOfNeighbours = 0;
 
+//                  For every cell the program checks nine cells, the 3 above, 3 on the line, and 3 below, this means the cell itself is counted but this is delt with later
                     for (int di = -1; di <= 1; di++) {
                         for (int dj = -1; dj <= 1; dj++) {
                             int newI = i + di;
@@ -80,33 +84,59 @@ public class Main {
 
                             if (newI >= 0 && newI < gridarray.length && newJ >= 0 && newJ < gridarray[i].length) {
                                 if (gridarray[newI][newJ] == 1) {
+//                              For every alive cell it increments the neighbour counter by one
+
                                     perSquareCounterOfNeighbours++;
                                 }
                             }
                         }
                     }
                     if (gridarray[i][j] == 1) {
+//                      if the cell in question is alive, and it has 2 or fewer neighbours (1 more than what is set in the Conways's game rules because it counts itself), then set that cell to dead in the second 2d array
                         if (perSquareCounterOfNeighbours <= 2) {
-                            gridarray[i][j] = 0;
+                            gridarraytwoelectricboolgaloo[i][j] = 0;
+//                          increment the number of changes in this generation by one
                             numOfChangesInGen++;
-                        } else if (perSquareCounterOfNeighbours < 5) {
-                            gridarray[i][j] = 2;
-//                            numOfChangesInGen++;
+                        } else if (perSquareCounterOfNeighbours <= 4) {
+//                            if the cell in question is alive, and it has 4 or fewer neighbours (1 more than what is set in the Conways's game rules because it counts itself), then set that cell to alive in the second 2d array
+                            gridarraytwoelectricboolgaloo[i][j] = 1;
                         } else {
-                            gridarray[i][j] = 0;
+//                            Otherwise set it to dead in the other 2d array
+                            gridarraytwoelectricboolgaloo[i][j] = 0;
+//                          increment the number of changes in this generation by one
                             numOfChangesInGen++;
                         }
                     }
                         if (gridarray[i][j] == 0) {
                             if (perSquareCounterOfNeighbours == 3) {
-                                gridarray[i][j] = 2;
+//                                If the cell in question is dead, and it has exactly 3 neighbours set it to alive in the new 2d array (it counting itself is not an issue here)
+                                gridarraytwoelectricboolgaloo[i][j] = 1;
+//                          increment the number of changes in this generation by one
                                 numOfChangesInGen++;
+                            }
+                            else {
+//                                Otherwise set it to be dead in the new 2d array
+                                gridarraytwoelectricboolgaloo[i][j] = 0;
                             }
                     }
                 }
 
 
             }
+//            For loop that sets the grid array to be the same as the new 2d grid array
+            for (int i = 0; i < gridarraytwoelectricboolgaloo.length; i++) {
+                for (int j = 0; j < gridarraytwoelectricboolgaloo[i].length; j++) {
+                    if (gridarraytwoelectricboolgaloo[i][j] == 0) {
+                      gridarray[i][j] = 0;
+                    } else {
+                        gridarray[i][j] = 1;
+                    }
+                }
+            }
+
+
+
+//          Print out the grid replacing all 0s with - and all 1s with X
             for (int i = 0; i < gridarray.length; i++) {
                 for (int j = 0; j < gridarray[i].length; j++) {
                     if (gridarray[i][j] == 0) {
@@ -117,15 +147,10 @@ public class Main {
                 }
                 System.out.println();
             }
-            for (int i = 0; i < gridarray.length; i++) {
-                for (int j = 0; j < gridarray[i].length; j++) {
-                    if (gridarray[i][j] == 2) {
-                        gridarray[i][j] = 1;
-                }
-            }
-        }
+//      Log the number of changes in this generation
         System.out.println(numOfChangesInGen);
         }
+//        Continue to do this while in each generation there is at least one new change or the generation count gets to be over 1000 (mostly for if there is a bug, or a looping combination)
         while (numOfChangesInGen >= 1 && numOfGens <= 1000);
     }
 
