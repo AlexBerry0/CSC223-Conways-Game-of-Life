@@ -1,9 +1,21 @@
+
+/**
+ * Title: Conway's Game of life
+ * Author: Alex Berry
+ * Date: 2-August-2023
+ * Version: 3
+ * Purpose: Simulate Conway's game of life
+ **/
+
+
 import java.util.Scanner;
 import java.lang.Math;
 
 public class Main {
 
-    public static void main(String[] args) {
+    public static int DEAD = 0;
+    public static int ALIVE = 1;
+    public static void main(String[] args) throws InterruptedException {
         System.out.println("Hello world!");
         Scanner keyboard = new Scanner(System.in);
         boolean manualSelection = false;
@@ -15,6 +27,7 @@ public class Main {
 //      Calls the get user input method with the messages asking how many rows and columns would the user like and how many gens would the user like. It also calls them with a min and max length of possible resulting number
         int rowsAndColumns = getUserInput(keyboard, "How many rows and columns would you like?", 5, 50);
         int numOfUserSpecifiedGenerations = getUserInput(keyboard, "In the case that the program doesn't finish before then how many generations would you like to simulate", 1, 1000);
+        int delayBetweenGens = getUserInput(keyboard, "How many milliseconds would you like there to be between generations? (1000 is one second", 1, 10000);
 
 //      This code asks the user if they would like to set the alive and dead starting cells manually
         System.out.println("Would you like to set the alive and dead starting cells manually?");
@@ -24,8 +37,7 @@ public class Main {
 //          inputString is set to what the user inputs and if its yes then manual selection is set to yes and if its no then to keep it false
             if (!inputString.equalsIgnoreCase("yes") && !inputString.equalsIgnoreCase("no")) {
                 System.out.println("That is not a valid answer, a valid answer is \"yes\" or \"no\" ");
-            }
-            else if (inputString.toLowerCase().equals("yes")) {
+            } else if (inputString.equalsIgnoreCase("yes")) {
                 manualSelection = true;
             }
         }
@@ -49,13 +61,14 @@ public class Main {
 
 //          Sets gridArray to be the same as newGridArray
             gridArray = newGridArray;
-
+//          Makes the code delay for the user specified time
+            Thread.sleep(delayBetweenGens);
 //          Prints gridArray and the Generation number then prints the number of changes in that generations
-            System.out.println("Generation: "+ numOfGens);
+            System.out.println("Generation: " + numOfGens);
             printGrid(gridArray);
-            System.out.println(numOfChangesInGen);
+//            System.out.println(numOfChangesInGen);
 //          continue doing this while the number of changes in the last generation was 1 or bigger and the number of Gens is less than the number of user requested gens
-        } while (numOfChangesInGen >= 1 && numOfGens <= numOfUserSpecifiedGenerations-1);
+        } while (numOfChangesInGen >= 1 && numOfGens <= numOfUserSpecifiedGenerations - 1);
     }
 
     public static int getUserInput(Scanner keyboard, String message, int min, int max) {
@@ -82,7 +95,7 @@ public class Main {
                         System.out.println("That number is too small please try again");
                     }
 //                  if its too big tell the user and prompt them again, also set isValid to false
-                    else if (inputValue >= max) {
+                    else {
                         System.out.println("That number is too big please try again");
                     }
                     isValid = false;
@@ -103,9 +116,9 @@ public class Main {
             for (int i = 0; i < gridArray.length; i++) {
                 for (int j = 0; j < gridArray[i].length; j++) {
                     if (Math.random() < 0.8) {
-                        gridArray[i][j] = 0;
+                        gridArray[i][j] = DEAD;
                     } else {
-                        gridArray[i][j] = 1;
+                        gridArray[i][j] = ALIVE;
                     }
                 }
             }
@@ -120,18 +133,16 @@ public class Main {
                 for (int j = 0; j < gridArray[i].length; j++) {
 //                    clear the input string then print out asking if the user would like each cell to be alive, they can then answer in a string
                     inputString = "";
-                    System.out.print("Would you like cell "+ (i+1) +", "+ (j+1) +" to be alive?\n");
+                    System.out.print("Would you like cell " + (i + 1) + ", " + (j + 1) + " to be alive?\n");
                     while (!inputString.equalsIgnoreCase("yes") && !inputString.equalsIgnoreCase("no")) {
                         inputString = keyboard.nextLine();
 //                      if they answer yes then the cell becomes alive, if they answer no then the cell becomes dead and if they answer something else they get prompted again
                         if (!inputString.equalsIgnoreCase("yes") && !inputString.equalsIgnoreCase("no")) {
                             System.out.println("That is not a valid answer, a valid answer is \"yes\" or \"no\" \n");
-                        }
-                        else if (inputString.equalsIgnoreCase("yes")) {
-                        gridArray[i][j] = 1;
-                        }
-                        else {
-                            gridArray[i][j] = 0;
+                        } else if (inputString.equalsIgnoreCase("yes")) {
+                            gridArray[i][j] = ALIVE;
+                        } else {
+                            gridArray[i][j] = DEAD;
                         }
                     }
                 }
@@ -154,7 +165,7 @@ public class Main {
                         int newJ = j + dj;
 
                         if (newI >= 0 && newI < gridArray.length && newJ >= 0 && newJ < gridArray[i].length) {
-                            if (gridArray[newI][newJ] == 1) {
+                            if (gridArray[newI][newJ] == ALIVE) {
                                 perSquareCounterOfNeighbours++;
                             }
                         }
@@ -164,22 +175,22 @@ public class Main {
                 if (gridArray[i][j] == 1) {
 //                      if the cell in question is alive, and it has 2 or fewer neighbours (1 more than what is set in the Conways's game rules because it counts itself), then set that cell to dead in the second 2d array
                     if (perSquareCounterOfNeighbours <= 2) {
-                        newGridArray[i][j] = 0;
+                        newGridArray[i][j] = DEAD;
                     }
 //                            if the cell in question is alive, and it has 4 or fewer neighbours (1 more than what is set in the Conways's game rules because it counts itself), then set that cell to alive in the second 2d array
                     else if (perSquareCounterOfNeighbours <= 4) {
-                        newGridArray[i][j] = 1;
+                        newGridArray[i][j] = ALIVE;
 //                            Otherwise set it to dead in the other 2d array
                     } else {
-                        newGridArray[i][j] = 0;
+                        newGridArray[i][j] = DEAD;
                     }
                 } else {
 //                                If the cell in question is dead, and it has exactly 3 neighbours set it to alive in the new 2d array (it counting itself is not an issue here)
                     if (perSquareCounterOfNeighbours == 3) {
-                        newGridArray[i][j] = 1;
+                        newGridArray[i][j] = ALIVE;
                     } else {
 //                                Otherwise set it to be dead in the new 2d array
-                        newGridArray[i][j] = 0;
+                        newGridArray[i][j] = DEAD;
                     }
                 }
             }
@@ -203,12 +214,11 @@ public class Main {
     }
 
 
-
     public static void printGrid(int[][] grid) {
 //      A method that goes through every cell and prints every 0 as a - and every one as an X and separates them by a space, then after a row prints a new line
         for (int i = 0; i < grid.length; i++) {
             for (int j = 0; j < grid[i].length; j++) {
-                if (grid[i][j] == 0) {
+                if (grid[i][j] == DEAD) {
                     System.out.print(" " + '-');
                 } else {
                     System.out.print(" " + 'X');
